@@ -1,12 +1,4 @@
-# Stage 1: build JAR
-FROM maven:3.9.5-eclipse-temurin-17 AS build
-WORKDIR /app
-COPY . .
-RUN mvn clean package -DskipTests
-
-# Stage 2: run app
-FROM eclipse-temurin:17-jre-alpine
-WORKDIR /app
-COPY --from=build /app/target/*.jar app.jar
+FROM tomcat:latest
+MAINTAINER Ashok <augasteenbandaru@gmail.com>
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+COPY target/maven-web-app.war /usr/local/tomcat/webapps/maven-web-app.war
