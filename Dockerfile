@@ -1,14 +1,25 @@
-# Using a Java runtime image
-FROM eclipse-temurin:17-jre-alpine
+# Stage 1: Build the Maven project
+FROM maven:3.9.5-eclipse-temurin-17 AS build
 
-# Setting working directory
 WORKDIR /app
 
-# Copy my built jar into the container
-COPY target/*.jar app.jar
+# Copy pom.xml and source code
+COPY pom.xml .
+COPY src ./src
 
-# Expose port
+# Build the project and skip tests
+RUN mvn clean package -DskipTests
+
+# Stage 2: Run the app with a lightweight JRE
+FROM eclipse-temurin:17-jre-alpine
+
+WORKDIR /app
+
+# Copy the built JAR from the build stage
+COPY --from=build /app/target/*.jar app.jar
+
+# Expose port the app runs on
 EXPOSE 8080
 
-# Run the application
+# Run the JAR
 ENTRYPOINT ["java", "-jar", "app.jar"]
