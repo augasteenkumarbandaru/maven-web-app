@@ -1,4 +1,14 @@
-FROM tomcat:latest
-MAINTAINER Ashok <ashok@oracle.coms>
+# Using a Java runtime image
+FROM eclipse-temurin:17-jre-alpine
+
+# Setting working directory
+WORKDIR /app
+
+# Copy my built jar into the container
+COPY target/*.jar app.jar
+
+# Expose port
 EXPOSE 8080
-COPY target/maven-web-app.war /usr/local/tomcat/webapps/maven-web-app.war
+
+# Run the application
+ENTRYPOINT ["java", "-jar", "app.jar"]
